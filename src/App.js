@@ -13,23 +13,35 @@ class App extends Component {
     this.state = {
       airports: [],
       selectedAirport: null,
-      loading: false
+      loading: false,
+      detail: null
     };
   }
 
-  async componentDidMount() {
-    await axios.get("http://0.0.0.0:5000/resources").then(response => {
-      const airports = response.map(x => {
+  componentDidMount() {
+    this.setState({ loading: true });
+    axios.get("http://localhost:5000/resources/").then(response => {
+      const airports = response["data"].map(x => {
         return { value: x.uri, label: x.name };
       });
-      this.setState({ airports });
+      this.setState({ airports, loading: false });
     });
   }
 
-  handleChange = selectedAirport => {
-    this.setState({ selectedAirport }, () =>
-      console.log(`Option selected:`, this.state.selectedAirport)
-    );
+  handleChange = async selectedAirport => {
+    const url =
+      "http://localhost:5000/resources/" +
+      selectedAirport["value"].split(/[/]+/).pop();
+    await axios.get(url).then(response => {
+      console.log(response);
+      const detail = response["data"].reduce((map, obj) => {
+        const key = obj["p"].split(/[/]+/).pop();
+        map[key] = obj["o"];
+        return map;
+      }, {});
+      this.setState({ detail });
+    });
+    this.setState({ selectedAirport });
   };
 
   render() {
@@ -42,6 +54,7 @@ class App extends Component {
               <div style={{ width: "50vw", color: "#282c34" }}>
                 <Select
                   autoFocus
+                  disabled={this.state.loading}
                   options={this.state.airports}
                   placeholder={"Enter airport name"}
                   onChange={this.handleChange}
@@ -72,70 +85,117 @@ class App extends Component {
                   Back
                 </Link>
                 <div className={"Abi"}>
-                  <h1>Singapore Changi Airport</h1>
+                  <h1>{this.state.selectedAirport.label}</h1>
                   <Typography
-                    style={{ display: "flex", justifyContent: "space-between" }}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      maxWidth: "50vw",
+                      flexWrap: "wrap"
+                    }}
                   >
-                    <Link
-                      href="http://www.wikidata.org/entity/Q1812824"
-                      target="_blank"
-                    >
-                      <h2 style={{ margin: 0 }}>Changi</h2>
-                    </Link>
-                    <Link
-                      href="http://www.wikidata.org/entity/Q1812824"
-                      target="_blank"
-                    >
-                      <h2 style={{ margin: 0 }}>Singapore</h2>
-                    </Link>
-                    <Link
-                      href="http://www.wikidata.org/entity/Q1812824"
-                      target="_blank"
-                    >
-                      <h2 style={{ margin: 0 }}>Asia</h2>
-                    </Link>
+                    {this.state.detail.Muncipality && (
+                      <Link
+                        href={this.state.detail.Muncipality}
+                        target="_blank"
+                      >
+                        <h2 style={{ margin: 0 }}>
+                          {this.state.detail.Muncipality.split(/[/]+/).pop()}
+                        </h2>
+                      </Link>
+                    )}
+                    {this.state.detail.Country && (
+                      <Link href={this.state.detail.Country} target="_blank">
+                        <h2 style={{ margin: 0 }}>
+                          {this.state.detail.Country.split(/[/]+/).pop()}
+                        </h2>
+                      </Link>
+                    )}
+                    {this.state.detail.Continent && (
+                      <Link href={this.state.detail.Continent} target="_blank">
+                        <h2 style={{ margin: 0 }}>
+                          {this.state.detail.Continent.split(/[/]+/).pop()}
+                        </h2>
+                      </Link>
+                    )}
                   </Typography>
                   <hr />
-                  <Typography
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <b>Type</b>
-                    <span>Large Airport</span>
-                  </Typography>
-                  <Typography
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <b>IATA Code</b>
-                    <span>SIN</span>
-                  </Typography>
-                  <Typography
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <b>ICAO Code</b>
-                    <span>WSSS</span>
-                  </Typography>
-                  <Typography
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <b>Latitude</b>
-                    <span>1.35019</span>
-                  </Typography>
-                  <Typography
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <b>Longitude</b>
-                    <span>103.994003</span>
-                  </Typography>
-                  <Typography
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <b>Elevation Height</b>
-                    <span>22</span>
-                  </Typography>
+                  {this.state.detail["22-rdf-syntax-ns#type"] && (
+                    <Typography
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <b>Type</b>
+                      <span>
+                        {this.state.detail["22-rdf-syntax-ns#type"]
+                          .split(/[/]+/)
+                          .pop()}
+                      </span>
+                    </Typography>
+                  )}
+                  {this.state.detail["IATACode"] && (
+                    <Typography
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <b>IATA Code</b>
+                      <span>{this.state.detail["IATACode"]}</span>
+                    </Typography>
+                  )}
+                  {this.state.detail["ICAOCode"] && (
+                    <Typography
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <b>ICAO Code</b>
+                      <span>{this.state.detail["ICAOCode"]}</span>
+                    </Typography>
+                  )}
+                  {this.state.detail["CoordinateLat"] && (
+                    <Typography
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <b>Latitude</b>
+                      <span>{this.state.detail["CoordinateLat"]}</span>
+                    </Typography>
+                  )}
+                  {this.state.detail["CoordinateLong"] && (
+                    <Typography
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <b>Longitude</b>
+                      <span>{this.state.detail["CoordinateLong"]}</span>
+                    </Typography>
+                  )}
+                  {this.state.detail["ElevationHeight"] && (
+                    <Typography
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <b>Elevation Height</b>
+                      <span>{this.state.detail["ElevationHeight"]}</span>
+                    </Typography>
+                  )}
                   <Typography
                     style={{ display: "flex", justifyContent: "center" }}
                   >
-                    <Link>More information</Link>
+                    <Link href={this.state.detail.P1659} target="_blank">
+                      More information
+                    </Link>
                   </Typography>
                 </div>
               </div>
