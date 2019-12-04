@@ -5,6 +5,7 @@ import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
 
 import "./App.css";
 import { Typography, Link } from "@material-ui/core";
+import axios from "axios";
 
 class App extends Component {
   constructor(props) {
@@ -16,11 +17,14 @@ class App extends Component {
     };
   }
 
-  options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" }
-  ];
+  async componentDidMount() {
+    await axios.get("http://0.0.0.0:5000/resources").then(response => {
+      const airports = response.map(x => {
+        return { value: x.uri, label: x.name };
+      });
+      this.setState({ airports });
+    });
+  }
 
   handleChange = selectedAirport => {
     this.setState({ selectedAirport }, () =>
@@ -38,7 +42,7 @@ class App extends Component {
               <div style={{ width: "50vw", color: "#282c34" }}>
                 <Select
                   autoFocus
-                  options={this.options}
+                  options={this.state.airports}
                   placeholder={"Enter airport name"}
                   onChange={this.handleChange}
                 />
