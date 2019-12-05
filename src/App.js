@@ -28,7 +28,7 @@ class App extends Component {
         const detail = response.data.results.bindings.reduce((map, obj) => {
           const key = obj.pLabel && obj.pLabel.value;
           if (!key) return map;
-          if (obj.o.type == "uri") {
+          if (obj.o.type === "uri") {
             map[key] = {
               uri: obj.o.value,
               desc: obj.oDesc && obj.oDesc.value,
