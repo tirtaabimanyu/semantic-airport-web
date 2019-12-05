@@ -146,13 +146,14 @@ class App extends Component {
                         title={this.state.detail.Muncipality.desc}
                       >
                         <Link
-                          style={{ cursor: "pointer" }}
+                          style={{ cursor: "pointer", margin: 0 }}
                           href={this.state.detail.Muncipality.uri}
                           target="_blank"
-                          component="h2"
                           gutterBottom
                         >
-                          {this.state.detail.Muncipality.label}
+                          <h2 style={{ margin: 0 }}>
+                            {this.state.detail.Muncipality.label}
+                          </h2>
                         </Link>
                       </Tooltip>
                     )}
@@ -162,13 +163,14 @@ class App extends Component {
                         title={this.state.detail.Country.desc}
                       >
                         <Link
-                          style={{ cursor: "pointer" }}
+                          style={{ cursor: "pointer", margin: 0 }}
                           href={this.state.detail.Country.uri}
                           target="_blank"
-                          component="h2"
                           gutterBottom
                         >
-                          {this.state.detail.Country.label}
+                          <h2 style={{ margin: 0 }}>
+                            {this.state.detail.Country.label}
+                          </h2>
                         </Link>
                       </Tooltip>
                     )}
@@ -178,13 +180,14 @@ class App extends Component {
                         title={this.state.detail.Continent.desc}
                       >
                         <Link
-                          style={{ cursor: "pointer" }}
+                          style={{ cursor: "pointer", margin: 0 }}
                           href={this.state.detail.Continent.uri}
                           target="_blank"
-                          component="h2"
                           gutterBottom
                         >
-                          {this.state.detail.Continent.label}
+                          <h2 style={{ margin: 0 }}>
+                            {this.state.detail.Continent.label}
+                          </h2>
                         </Link>
                       </Tooltip>
                     )}
